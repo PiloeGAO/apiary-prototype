@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+    ports:
+      - '27017:27017'
+    volumes:
+      - db_storage:/data/db
+
+  jobs:
+    build: apiary-jobs
+    depends_on:
+      - db
+
+  api:
+    build: apiary-api
+    ports:
+      - "80:80"
+    environment:
+      - JOBS_HOSTNAME
+    depends_on:
+      - jobs
+
+volumes:
+  db_storage:
