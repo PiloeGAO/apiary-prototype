@@ -15,6 +15,11 @@ services:
     build: apiary-jobs
     depends_on:
       - db
+    environment:
+      - DB_USER=${MONGO_INITDB_ROOT_USERNAME}
+      - DB_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=27017
 
   api:
     build: apiary-api

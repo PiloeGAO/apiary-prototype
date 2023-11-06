@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.10"
 fastapi = "^0.104.1"
 uvicorn = {extras = ["standard"], version = "^0.23.2"}
+fastapi-crudrouter-mongodb = "^0.0.8"
 
 
 [tool.poetry.group.dev.dependencies]
