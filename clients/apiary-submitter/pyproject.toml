@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "apiary-submitter"
+version = "0.1.0"
+description = "Apiary submitter library."
+authors = ["PiloeGAO <leonumerique@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+urllib3 = ">= 1.25.3"
+python-dateutil = ">=2.8.2"
+pydantic = ">=2"
+typing-extensions = ">=4.7.1"
+apiary-openapi = {path = "../apiary-openapi/dist/apiary_openapi-0.1.0-py3-none-any.whl"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+pylint = "^3.0.2"
+pytest = "^7.4.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

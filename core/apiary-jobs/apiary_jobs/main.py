@@ -33,7 +33,7 @@ class TaskModel(MongoModel):
     command: Optional[str]
     status: Optional[int] = 0
     parents: Optional[list[MongoObjectId]] = []
-    tags: Optional[list[int]] = []
+    tags: Optional[list[str]] = []
     runs: Optional[list[MongoObjectId]] = []
     metadata: Optional[dict] = {}
 
@@ -44,9 +44,10 @@ class JobModel(MongoModel):
     user_id: Optional[int]
     submission: Optional[str] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     status: Optional[int] = 0
-    pools: Optional[list[int]] = []
+    pools: Optional[list[str]] = []
     priority: Optional[int] = 500
     tasks: Optional[list[MongoObjectId]] = []
+    tags: Optional[list[str]] = []
     metadata: Optional[dict] = {}
 
 # FastAPI app.

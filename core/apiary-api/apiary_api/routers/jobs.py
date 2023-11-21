@@ -8,10 +8,13 @@ from fastapi.responses import JSONResponse
 from apiary_api.models.jobs import (
     JobCreateModel,
     JobEditModel,
+    JobModel,
     TaskCreateModel,
     TaskEditModel,
+    TaskModel,
     RunCreateModel,
     RunEditModel,
+    RunModel,
 )
 from apiary_api.constants import JOBS_HOSTNAME
 from apiary_api import logger
@@ -23,7 +26,7 @@ jobs_router = APIRouter(prefix="/jobs")
 tasks_router = APIRouter(prefix="/tasks")
 runs_router = APIRouter(prefix="/runs")
 
-@jobs_router.get("/", tags=["jobs"], response_model=list[JobEditModel])
+@jobs_router.get("/", tags=["jobs"], response_model=list[JobModel])
 async def get_jobs():
     """Get the list of jobs.
 
@@ -39,7 +42,7 @@ async def get_jobs():
 
     return response.json()
 
-@jobs_router.post("/", tags=["jobs"], response_model=JobEditModel)
+@jobs_router.post("/", tags=["jobs"], response_model=JobModel)
 async def post_jobs(job: JobCreateModel):
     """Create a new job.
 
@@ -66,7 +69,7 @@ async def post_jobs(job: JobCreateModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.get("/{job_id}", tags=["jobs"], response_model=JobEditModel)
+@jobs_router.get("/{job_id}", tags=["jobs"], response_model=JobModel)
 async def get_job(job_id: str):
     """Get a job.
 
@@ -85,7 +88,7 @@ async def get_job(job_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.patch("/{job_id}", tags=["jobs"], response_model=JobEditModel)
+@jobs_router.patch("/{job_id}", tags=["jobs"], response_model=JobModel)
 async def patch_job(job_id: str, job: JobEditModel):
     """Update a job.
 
@@ -120,7 +123,7 @@ async def patch_job(job_id: str, job: JobEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.delete("/{job_id}", tags=["jobs"], response_model=JobEditModel)
+@jobs_router.delete("/{job_id}", tags=["jobs"], response_model=JobModel)
 async def delete_job(job_id: str):
     """Delete a job and it's tasks.
 
@@ -152,7 +155,7 @@ async def delete_job(job_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.get("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskEditModel])
+@jobs_router.get("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskModel])
 async def get_tasks_from_job(job_id: str):
     """Get all the tasks for a job.
 
@@ -180,7 +183,7 @@ async def get_tasks_from_job(job_id: str):
 
     return JSONResponse(content=tasks)
 
-@jobs_router.post("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskEditModel])
+@jobs_router.post("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskModel])
 async def post_tasks_from_job(job_id: str, tasks: list[TaskCreateModel]):
     """Create a list of tasks for a job.
 
@@ -204,9 +207,10 @@ async def post_tasks_from_job(job_id: str, tasks: list[TaskCreateModel]):
         ]
     )
 
-    return await patch_job(job_id, job_edit)
+    await patch_job(job_id, job_edit)
+    return tasks_data
 
-@tasks_router.get("/", tags=["tasks"], response_model=list[TaskEditModel])
+@tasks_router.get("/", tags=["tasks"], response_model=list[TaskModel])
 async def get_tasks():
     """Get the list of tasks.
 
@@ -222,7 +226,7 @@ async def get_tasks():
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.post("/", tags=["tasks"], response_model=list[TaskEditModel])
+@tasks_router.post("/", tags=["tasks"], response_model=list[TaskModel])
 async def post_tasks(tasks: list[TaskCreateModel]):
     """Create a list of tasks.
 
@@ -237,7 +241,6 @@ async def post_tasks(tasks: list[TaskCreateModel]):
     async with httpx.AsyncClient() as client:
         for task in tasks:
             task_data = task.__dict__
-            task_data.pop("tags")
             response = await client.post(f"http://{JOBS_HOSTNAME}/tasks/", json=task_data)
 
             if not response.is_success:
@@ -251,7 +254,7 @@ async def post_tasks(tasks: list[TaskCreateModel]):
 
     return JSONResponse(content=tasks_data)
 
-@tasks_router.get("/{task_id}", tags=["tasks"], response_model=TaskEditModel)
+@tasks_router.get("/{task_id}", tags=["tasks"], response_model=TaskModel)
 async def get_task(task_id: str):
     """Get a task.
 
@@ -270,7 +273,7 @@ async def get_task(task_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.patch("/{task_id}", tags=["tasks"], response_model=TaskEditModel)
+@tasks_router.patch("/{task_id}", tags=["tasks"], response_model=TaskModel)
 async def patch_task(task_id: str, task: TaskEditModel):
     """Update a task.
 
@@ -295,7 +298,7 @@ async def patch_task(task_id: str, task: TaskEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.delete("/{task_id}", tags=["tasks"], response_model=TaskEditModel)
+@tasks_router.delete("/{task_id}", tags=["tasks"], response_model=TaskModel)
 async def delete_task(task_id: str):
     """Delete a task.
 
@@ -331,7 +334,7 @@ async def delete_task(task_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.get("/{task_id}/runs", tags=["tasks"], response_model=list[RunEditModel])
+@tasks_router.get("/{task_id}/runs", tags=["tasks"], response_model=list[RunModel])
 async def get_runs_from_task(task_id: str):
     """Get all the runs for a task.
 
@@ -359,7 +362,7 @@ async def get_runs_from_task(task_id: str):
 
     return JSONResponse(content=runs)
 
-@tasks_router.post("/{task_id}/runs", tags=["tasks"], response_model=RunEditModel)
+@tasks_router.post("/{task_id}/runs", tags=["tasks"], response_model=RunModel)
 async def post_run_from_task(task_id: str, run: RunCreateModel):
     """Create a new run for a task.
 
@@ -385,7 +388,7 @@ async def post_run_from_task(task_id: str, run: RunCreateModel):
 
     return await patch_task(task_id, task_edit)
 
-@runs_router.get("", tags=["runs"], response_model=list[RunEditModel])
+@runs_router.get("", tags=["runs"], response_model=list[RunModel])
 async def get_runs():
     """Get the list of runs.
 
@@ -401,7 +404,7 @@ async def get_runs():
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.post("", tags=["runs"], response_model=RunEditModel)
+@runs_router.post("", tags=["runs"], response_model=RunModel)
 async def post_runs(run: RunCreateModel):
     """Create a new run.
 
@@ -422,7 +425,7 @@ async def post_runs(run: RunCreateModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.get("/{run_id}", tags=["runs"], response_model=RunEditModel)
+@runs_router.get("/{run_id}", tags=["runs"], response_model=RunModel)
 async def get_run(run_id: str):
     """Get a run.
 
@@ -441,7 +444,7 @@ async def get_run(run_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.patch("/{run_id}", tags=["runs"], response_model=RunEditModel)
+@runs_router.patch("/{run_id}", tags=["runs"], response_model=RunModel)
 async def patch_run(run_id: str, run: RunEditModel):
     """Update a run.
 
@@ -466,7 +469,7 @@ async def patch_run(run_id: str, run: RunEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.delete("/{run_id}", tags=["runs"], response_model=RunEditModel)
+@runs_router.delete("/{run_id}", tags=["runs"], response_model=RunModel)
 async def delete_run(run_id: str):
     """Delete a run.
 
