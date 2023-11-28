@@ -2,6 +2,7 @@
 
 from fastapi import Response
 
+
 def is_response_successfull(response: Response):
     """Response are sucessfull for codes between 200 and 299.
 

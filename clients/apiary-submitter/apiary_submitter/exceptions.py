@@ -4,4 +4,6 @@
 class SubmitException(Exception):
     """Exception to be raised when the submit failed."""
 
-    pass
+
+class RequestException(Exception):
+    """Exception to be raised when a query to the API failed."""

@@ -22,11 +22,12 @@ from apiary_api.utils import is_response_successfull
 
 LOGGER = logger.setup()
 
-jobs_router = APIRouter(prefix="/jobs")
-tasks_router = APIRouter(prefix="/tasks")
-runs_router = APIRouter(prefix="/runs")
+jobs_router = APIRouter(prefix="/jobs", tags=["jobs"])
+tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
+runs_router = APIRouter(prefix="/runs", tags=["runs"])
 
-@jobs_router.get("/", tags=["jobs"], response_model=list[JobModel])
+
+@jobs_router.get("/", response_model=list[JobModel])
 async def get_jobs():
     """Get the list of jobs.
 
@@ -42,7 +43,8 @@ async def get_jobs():
 
     return response.json()
 
-@jobs_router.post("/", tags=["jobs"], response_model=JobModel)
+
+@jobs_router.post("/", response_model=JobModel)
 async def post_jobs(job: JobCreateModel):
     """Create a new job.
 
@@ -69,7 +71,8 @@ async def post_jobs(job: JobCreateModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.get("/{job_id}", tags=["jobs"], response_model=JobModel)
+
+@jobs_router.get("/{job_id}", response_model=JobModel)
 async def get_job(job_id: str):
     """Get a job.
 
@@ -88,7 +91,8 @@ async def get_job(job_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.patch("/{job_id}", tags=["jobs"], response_model=JobModel)
+
+@jobs_router.patch("/{job_id}", response_model=JobModel)
 async def patch_job(job_id: str, job: JobEditModel):
     """Update a job.
 
@@ -115,7 +119,9 @@ async def patch_job(job_id: str, job: JobEditModel):
     job_data["tasks"] = tasks_ids
 
     async with httpx.AsyncClient() as client:
-        response = await client.patch(f"http://{JOBS_HOSTNAME}/jobs/{job_id}", json=job.__dict__)
+        response = await client.patch(
+            f"http://{JOBS_HOSTNAME}/jobs/{job_id}", json=job.__dict__
+        )
 
         if not response.is_success:
             LOGGER.warning("Job update failed.")
@@ -123,7 +129,8 @@ async def patch_job(job_id: str, job: JobEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.delete("/{job_id}", tags=["jobs"], response_model=JobModel)
+
+@jobs_router.delete("/{job_id}", response_model=JobModel)
 async def delete_job(job_id: str):
     """Delete a job and it's tasks.
 
@@ -155,7 +162,8 @@ async def delete_job(job_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@jobs_router.get("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskModel])
+
+@jobs_router.get("/{job_id}/tasks", response_model=list[TaskModel])
 async def get_tasks_from_job(job_id: str):
     """Get all the tasks for a job.
 
@@ -183,7 +191,8 @@ async def get_tasks_from_job(job_id: str):
 
     return JSONResponse(content=tasks)
 
-@jobs_router.post("/{job_id}/tasks", tags=["jobs"], response_model=list[TaskModel])
+
+@jobs_router.post("/{job_id}/tasks", response_model=list[TaskModel])
 async def post_tasks_from_job(job_id: str, tasks: list[TaskCreateModel]):
     """Create a list of tasks for a job.
 
@@ -210,7 +219,8 @@ async def post_tasks_from_job(job_id: str, tasks: list[TaskCreateModel]):
     await patch_job(job_id, job_edit)
     return tasks_data
 
-@tasks_router.get("/", tags=["tasks"], response_model=list[TaskModel])
+
+@tasks_router.get("/", response_model=list[TaskModel])
 async def get_tasks():
     """Get the list of tasks.
 
@@ -226,7 +236,8 @@ async def get_tasks():
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.post("/", tags=["tasks"], response_model=list[TaskModel])
+
+@tasks_router.post("/", response_model=list[TaskModel])
 async def post_tasks(tasks: list[TaskCreateModel]):
     """Create a list of tasks.
 
@@ -241,12 +252,14 @@ async def post_tasks(tasks: list[TaskCreateModel]):
     async with httpx.AsyncClient() as client:
         for task in tasks:
             task_data = task.__dict__
-            response = await client.post(f"http://{JOBS_HOSTNAME}/tasks/", json=task_data)
+            response = await client.post(
+                f"http://{JOBS_HOSTNAME}/tasks/", json=task_data
+            )
 
             if not response.is_success:
                 LOGGER.warning(
                     "Task creation failed with the following message: %s",
-                    response.json()
+                    response.json(),
                 )
                 continue
 
@@ -254,7 +267,8 @@ async def post_tasks(tasks: list[TaskCreateModel]):
 
     return JSONResponse(content=tasks_data)
 
-@tasks_router.get("/{task_id}", tags=["tasks"], response_model=TaskModel)
+
+@tasks_router.get("/{task_id}", response_model=TaskModel)
 async def get_task(task_id: str):
     """Get a task.
 
@@ -273,7 +287,8 @@ async def get_task(task_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.patch("/{task_id}", tags=["tasks"], response_model=TaskModel)
+
+@tasks_router.patch("/{task_id}", response_model=TaskModel)
 async def patch_task(task_id: str, task: TaskEditModel):
     """Update a task.
 
@@ -290,7 +305,9 @@ async def patch_task(task_id: str, task: TaskEditModel):
         return task_response
 
     async with httpx.AsyncClient() as client:
-        response = await client.patch(f"http://{JOBS_HOSTNAME}/tasks/{task_id}", json=task.__dict__)
+        response = await client.patch(
+            f"http://{JOBS_HOSTNAME}/tasks/{task_id}", json=task.__dict__
+        )
 
         if not response.is_success:
             LOGGER.warning("Task update failed.")
@@ -298,7 +315,8 @@ async def patch_task(task_id: str, task: TaskEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.delete("/{task_id}", tags=["tasks"], response_model=TaskModel)
+
+@tasks_router.delete("/{task_id}", response_model=TaskModel)
 async def delete_task(task_id: str):
     """Delete a task.
 
@@ -327,14 +345,14 @@ async def delete_task(task_id: str):
 
         if not response.is_success:
             LOGGER.warning(
-                "Task deletion failed with the following message: %s",
-                response.content
+                "Task deletion failed with the following message: %s", response.content
             )
             return Response(content=response.content, status_code=response.status_code)
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@tasks_router.get("/{task_id}/runs", tags=["tasks"], response_model=list[RunModel])
+
+@tasks_router.get("/{task_id}/runs", response_model=list[RunModel])
 async def get_runs_from_task(task_id: str):
     """Get all the runs for a task.
 
@@ -362,7 +380,8 @@ async def get_runs_from_task(task_id: str):
 
     return JSONResponse(content=runs)
 
-@tasks_router.post("/{task_id}/runs", tags=["tasks"], response_model=RunModel)
+
+@tasks_router.post("/{task_id}/runs", response_model=RunModel)
 async def post_run_from_task(task_id: str, run: RunCreateModel):
     """Create a new run for a task.
 
@@ -388,7 +407,8 @@ async def post_run_from_task(task_id: str, run: RunCreateModel):
 
     return await patch_task(task_id, task_edit)
 
-@runs_router.get("", tags=["runs"], response_model=list[RunModel])
+
+@runs_router.get("", response_model=list[RunModel])
 async def get_runs():
     """Get the list of runs.
 
@@ -404,7 +424,8 @@ async def get_runs():
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.post("", tags=["runs"], response_model=RunModel)
+
+@runs_router.post("", response_model=RunModel)
 async def post_runs(run: RunCreateModel):
     """Create a new run.
 
@@ -425,7 +446,8 @@ async def post_runs(run: RunCreateModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.get("/{run_id}", tags=["runs"], response_model=RunModel)
+
+@runs_router.get("/{run_id}", response_model=RunModel)
 async def get_run(run_id: str):
     """Get a run.
 
@@ -444,7 +466,8 @@ async def get_run(run_id: str):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.patch("/{run_id}", tags=["runs"], response_model=RunModel)
+
+@runs_router.patch("/{run_id}", response_model=RunModel)
 async def patch_run(run_id: str, run: RunEditModel):
     """Update a run.
 
@@ -461,7 +484,9 @@ async def patch_run(run_id: str, run: RunEditModel):
         return run_response
 
     async with httpx.AsyncClient() as client:
-        response = await client.patch(f"http://{JOBS_HOSTNAME}/runs/{run_id}", json=run.__dict__)
+        response = await client.patch(
+            f"http://{JOBS_HOSTNAME}/runs/{run_id}", json=run.__dict__
+        )
 
         if not response.is_success:
             LOGGER.warning("Run update failed.")
@@ -469,7 +494,8 @@ async def patch_run(run_id: str, run: RunEditModel):
 
     return JSONResponse(content=response.json(), status_code=response.status_code)
 
-@runs_router.delete("/{run_id}", tags=["runs"], response_model=RunModel)
+
+@runs_router.delete("/{run_id}", response_model=RunModel)
 async def delete_run(run_id: str):
     """Delete a run.
 
@@ -489,8 +515,7 @@ async def delete_run(run_id: str):
 
         if not response.is_success:
             LOGGER.warning(
-                "Run deletion failed with the following message: %s",
-                response.content
+                "Run deletion failed with the following message: %s", response.content
             )
             return Response(content=response.content, status_code=response.status_code)
 

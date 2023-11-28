@@ -4,6 +4,7 @@ import logging
 
 from apiary_api.constants import DEBUG
 
+
 @cache
 def setup():
     """Setup the package logger.
@@ -21,7 +22,7 @@ def setup():
     # Console logging.
     formatter = logging.Formatter(
         "Apiary API | %(levelname)s - %(message)s @ [%(asctime)s] | %(pathname)s:%(lineno)d",
-        "%y-%m-%d %H:%M:%S"
+        "%y-%m-%d %H:%M:%S",
     )
 
     stream_handler = logging.StreamHandler()
