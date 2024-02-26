@@ -2,7 +2,7 @@
 import httpx
 from fastapi import APIRouter
 
-from apiary_api.constants import JOBS_HOSTNAME
+from apiary_api.constants import JOBS_HOSTNAME, WORKERS_HOSTNAME
 from apiary_api.models import api_status
 
 
@@ -32,4 +32,16 @@ async def get_jobs_status():
     """
     async with httpx.AsyncClient() as client:
         response = await client.get(f"http://{JOBS_HOSTNAME}/status")
+    return response.json()
+
+
+@api_statuses_router.get("/workers", response_model=api_status.APIStatusModel)
+async def get_workers_status():
+    """Get the status of the workers microservice.
+
+    Returns:
+        :class:`apiary_api.models.api_status.APIStatusModel`: Result from status query.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"http://{WORKERS_HOSTNAME}/status")
     return response.json()

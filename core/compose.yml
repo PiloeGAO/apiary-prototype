@@ -21,14 +21,26 @@ services:
       - DB_HOST=db
       - DB_PORT=27017
 
+  workers:
+    build: apiary-workers
+    depends_on:
+      - db
+    environment:
+      - DB_USER=${MONGO_INITDB_ROOT_USERNAME}
+      - DB_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=27017
+
   api:
     build: apiary-api
     ports:
       - "80:80"
     environment:
       - JOBS_HOSTNAME
+      - WORKERS_HOSTNAME
     depends_on:
       - jobs
+      - workers
 
 volumes:
   db_storage:

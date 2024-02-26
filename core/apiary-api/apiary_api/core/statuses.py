@@ -44,3 +44,13 @@ class RunStatuses(MetaStatuses):
     IN_PROGRESS = auto()
     DONE = auto()
     ERROR = auto()
+
+
+@unique
+class WorkerStatuses(MetaStatuses):
+    """Statuses for workers."""
+
+    CONNECTED = auto()
+    PROCESSING = auto()
+    DISCONNECTED = auto()
+    PAUSED = auto()
